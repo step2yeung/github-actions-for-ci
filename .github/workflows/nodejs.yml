@@ -6,13 +6,8 @@ name: Node CI
 on: [push]
 
 jobs:
-      - uses: actions/upload-artifact@master
-        with:
-          name: webpack artifacts
-          path: public/
-
-    needs: build
-
+  build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: npm install and build webpack
@@ -22,14 +17,20 @@ jobs:
       - uses: actions/upload-artifact@master
         with:
           name: webpack artifacts
-          path: public/ 
+          path: public/
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install, and test
+        run: |
+          npm install
+          npm test
+        env:
+          CI: true
 
   test:
-    - uses: actions/download-artifact@master
-      with:
-        name: webpack artifacts
-        path: public
-    - name: npm install, and test
+
     runs-on: ubuntu-latest
 
     strategy:
